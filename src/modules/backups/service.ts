@@ -1,8 +1,8 @@
-import {MedusaService} from "@medusajs/framework/utils";
-import BackupsModel from "./models/backups_models";
+import { MedusaService } from "@medusajs/framework/utils"
+import Backup from "./models/backups_models"
 
 class BackupsService extends MedusaService({
-  BackupsModel
+  Backup,
 }) {}
 
-export default BackupsService;
+export default BackupsService
