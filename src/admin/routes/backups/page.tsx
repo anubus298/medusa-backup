@@ -43,7 +43,7 @@ const Backups = () => {
   const fetchBackups = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/admin/backups/db-backup", {
+      const response = await fetch("/admin/backup/db-backup", {
         method: "GET",
         credentials: "include"
       });
@@ -59,7 +59,7 @@ const Backups = () => {
   const handleBackup = async () => {
     try {
       setBacking(true);
-      const response = await fetch("/admin/backups/db-backup", {
+      const response = await fetch("/admin/backup/db-backup", {
         method: "POST",
         credentials: "include"
       });
@@ -84,7 +84,7 @@ const Backups = () => {
     setOpenRestore(false);
     try {
       setRestoring(true);
-      const response = await fetch("/admin/backups/db-restore", {
+      const response = await fetch("/admin/backup/db-restore", {
         method: "POST",
         body: JSON.stringify({backupKey}),
         credentials: "include"
