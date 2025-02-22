@@ -1,12 +1,10 @@
 {
   "name": "medusa-backup",
   "version": "0.0.1",
-  "description": "A starter for Medusa plugins.",
-  "author": "Medusa (https://medusajs.com)",
+  "description": "DB Backup and Restore for Medusa",
+  "author": "Ameer Rizvi (https://github.com/AmeerRizvi)",
   "license": "MIT",
-  "files": [
-    ".medusa/server"
-  ],
+  "files": [".medusa/server"],
   "exports": {
     "./package.json": "./package.json",
     "./workflows": "./.medusa/server/src/workflows/index.js",
