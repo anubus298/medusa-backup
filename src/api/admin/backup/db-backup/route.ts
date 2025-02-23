@@ -2,8 +2,9 @@ import path from "path";
 import os from "os";
 import {exec} from "child_process";
 import fs from "fs";
-import {S3FileService} from "../utils";
 import {BACKUPS_MODULE} from "../../../../modules/backups";
+import {uploadFilesWorkflow} from "@medusajs/medusa/core-flows";
+import AdmZip from "adm-zip";
 
 const DB_BASE = process.env.DATABASE_URL;
 const DB_NAME = process.env.DB_NAME;
@@ -19,7 +20,7 @@ export async function POST(req, res) {
     if (existingBackups.length > 0) {
       return res.status(400).json({
         error:
-          "Backup is already in progress. Please wait until it is completed."
+          "Backup is already in progress. Please wait until it is completed.",
       });
     }
 
@@ -38,39 +39,65 @@ export async function POST(req, res) {
       if (error || stderr || !fs.existsSync(BACKUP_FILE)) {
         await service.updateBackups({id: backupId, status: "error"});
         return res.status(500).json({
-          error: error ? error.message : stderr || "Backup file not found!"
+          error: error ? error.message : stderr || "Backup file not found!",
         });
       }
 
       try {
-        const s3FileService = new S3FileService();
-        const s3Key = await s3FileService.uploadBackup(BACKUP_FILE);
+        const fileName = path.basename(BACKUP_FILE);
+        const timestamp = new Date().toISOString().replace(/[:.-]/g, "_");
+        const zipFileName = fileName.replace(".sql", `_${timestamp}.zip`);
+        const zipFilePath = path.join(path.dirname(BACKUP_FILE), zipFileName);
+
+        const zip = new AdmZip();
+        zip.addLocalFile(BACKUP_FILE, "", fileName);
+        zip.writeZip(zipFilePath);
+
+        const fileBuffer = fs.readFileSync(zipFilePath);
+
+        const {result} = await uploadFilesWorkflow(req.scope).run({
+          input: {
+            files: [
+              {
+                filename: zipFileName,
+                content: fileBuffer.toString("base64"),
+                mimeType: "application/zip",
+                access: "private",
+              },
+            ],
+          },
+        });
+
         fs.unlinkSync(BACKUP_FILE);
+
+        console.log({result});
+
+        const fileId = result[0].id;
 
         await service.updateBackups({
           id: backupId,
-          url: s3Key,
-          status: "success"
+          url: fileId,
+          status: "success",
         });
 
         return res.status(200).json({
           id: backupId,
-          s3Url: s3Key,
-          message: "Backup completed successfully"
+          s3Url: fileId,
+          message: "Backup completed successfully",
         });
       } catch (uploadError) {
         await service.updateBackups({
           id: backupId,
-          status: "error"
+          status: "error",
         });
         return res.status(500).json({
-          error: `Error uploading to S3: ${uploadError.message}`
+          error: `Error uploading to S3: ${uploadError.message}`,
         });
       }
     });
   } catch (err) {
     return res.status(500).json({
-      error: `Unexpected error: ${err.message}`
+      error: `Unexpected error: ${err.message}`,
     });
   }
 }
