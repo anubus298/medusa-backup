@@ -2,12 +2,12 @@ import path from "path";
 import os from "os";
 import {execSync} from "child_process";
 import fs from "fs";
-import AdmZip from "adm-zip";
 import {BACKUPS_MODULE} from "../../../../modules/backups";
 import {uploadFilesWorkflow} from "@medusajs/medusa/core-flows";
 
-const DB_BASE = process.env.DATABASE_URL;
+const DB_BASE = process.env.DB_BASE;
 const DB_NAME = process.env.DB_NAME;
+
 const TEMP_DIR = os.tmpdir();
 const BACKUP_FILE = path.join(TEMP_DIR, "db_backup.sql");
 
@@ -16,9 +16,8 @@ async function createBackupZip() {
   const zipFileName = `db_backup_${timestamp}.zip`;
   const zipFilePath = path.join(TEMP_DIR, zipFileName);
 
-  const zip = new AdmZip();
-  zip.addLocalFile(BACKUP_FILE);
-  zip.writeZip(zipFilePath);
+  // Use the system's `zip` command
+  execSync(`zip -j "${zipFilePath}" "${BACKUP_FILE}"`);
 
   return {zipFileName, zipFilePath};
 }
@@ -61,11 +60,13 @@ export async function POST(req, res) {
     });
 
     const fileId = result?.[0]?.id || "";
+    const fileUrl = result?.[0]?.url || "";
     if (!fileId) throw new Error("Failed to upload backup to S3");
 
     await service.updateBackups({
       id: backupId,
-      url: fileId,
+      fileId: fileId,
+      fileUrl: fileUrl,
       status: "success",
     });
 
@@ -74,7 +75,8 @@ export async function POST(req, res) {
 
     return res.status(200).json({
       id: backupId,
-      s3Url: fileId,
+      fileId: fileId,
+      fileUrl: fileUrl,
       message: "Backup completed successfully",
     });
   } catch (error) {
