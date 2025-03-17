@@ -2,9 +2,10 @@ import {model} from "@medusajs/framework/utils";
 
 const Backup = model.define("db_backups", {
   id: model.id().primaryKey(),
-  url: model.text().nullable(),
+  fileId: model.text().nullable(),
+  fileUrl: model.text().nullable(),
   status: model.text().nullable(),
   metadata: model.json().nullable(),
 });
 
-export default Backup
+export default Backup;
