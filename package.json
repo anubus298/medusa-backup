@@ -1,6 +1,6 @@
 {
   "name": "medusa-backup",
-  "version": "0.2.1",
+  "version": "0.2.16",
   "description": "DB Backup and Restore for Medusa",
   "author": "Ameer Rizvi (https://github.com/AmeerRizvi)",
   "license": "MIT",
@@ -66,9 +66,11 @@
     "@mikro-orm/migrations": "6.4.3",
     "@mikro-orm/postgresql": "6.4.3",
     "awilix": "^8.0.1",
-    "pg": "^8.13.0",
-    "date-fns": "^4.1.0",
-    "adm-zip": "^0.5.16"
+    "pg": "^8.13.0"
+  },
+  "dependencies": {
+    "unzipper": "^0.12.3",
+    "date-fns": "^4.1.0"
   },
   "engines": {
     "node": ">=20"
