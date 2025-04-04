@@ -4,23 +4,13 @@ import {execSync} from "child_process";
 import fs from "fs";
 import {BACKUPS_MODULE} from "../../../../modules/backups";
 import {uploadFilesWorkflow} from "@medusajs/medusa/core-flows";
+import {createBackupZip} from "../utils";
 
 const DB_BASE = process.env.DB_BASE;
 const DB_NAME = process.env.DB_NAME;
 
 const TEMP_DIR = os.tmpdir();
 const BACKUP_FILE = path.join(TEMP_DIR, "db_backup.sql");
-
-async function createBackupZip() {
-  const timestamp = new Date().toISOString().replace(/[:.-]/g, "_");
-  const zipFileName = `db_backup_${timestamp}.zip`;
-  const zipFilePath = path.join(TEMP_DIR, zipFileName);
-
-  // Use the system's `zip` command
-  execSync(`zip -j "${zipFilePath}" "${BACKUP_FILE}"`);
-
-  return {zipFileName, zipFilePath};
-}
 
 export async function POST(req, res) {
   const service = req.scope.resolve(BACKUPS_MODULE);
@@ -43,7 +33,10 @@ export async function POST(req, res) {
 
     if (!fs.existsSync(BACKUP_FILE)) throw new Error("Backup file not found!");
 
-    const {zipFileName, zipFilePath} = await createBackupZip();
+    const {zipFileName, zipFilePath} = await createBackupZip(
+      TEMP_DIR,
+      BACKUP_FILE
+    );
     const fileBuffer = fs.readFileSync(zipFilePath);
 
     const {result} = await uploadFilesWorkflow(req.scope).run({
@@ -53,10 +46,10 @@ export async function POST(req, res) {
             filename: zipFileName,
             content: fileBuffer.toString("base64"),
             mimeType: "application/zip",
-            access: "private",
-          },
-        ],
-      },
+            access: "private"
+          }
+        ]
+      }
     });
 
     const fileId = result?.[0]?.id || "";
@@ -67,7 +60,7 @@ export async function POST(req, res) {
       id: backupId,
       fileId: fileId,
       fileUrl: fileUrl,
-      status: "success",
+      status: "success"
     });
 
     fs.unlinkSync(BACKUP_FILE);
@@ -77,10 +70,12 @@ export async function POST(req, res) {
       id: backupId,
       fileId: fileId,
       fileUrl: fileUrl,
-      message: "Backup completed successfully",
+      message: "Backup completed successfully"
     });
   } catch (error) {
-    await service.updateBackups({id: error.backupId || "", status: "error"});
+    if (error.backupId) {
+      await service.updateBackups({id: error.backupId, status: "error"});
+    }
     return res.status(500).json({error: `Backup failed: ${error.message}`});
   }
 }
