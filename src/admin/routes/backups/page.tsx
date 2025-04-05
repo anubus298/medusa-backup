@@ -1,5 +1,5 @@
 import {defineRouteConfig} from "@medusajs/admin-sdk";
-import {ServerStack} from "@medusajs/icons";
+import {InformationCircle, ServerStack} from "@medusajs/icons";
 import {
   Container,
   Heading,
@@ -10,43 +10,45 @@ import {
   toast,
   FocusModal,
   Input,
-  Label,
-  Text
+  Copy,
+  usePrompt
 } from "@medusajs/ui";
 import {useEffect, useState} from "react";
 import {formatDistanceToNow, parseISO} from "date-fns";
 import {useNavigate} from "react-router-dom";
-
-type Backup = {
-  id: string;
-  status: string;
-  created_at: string;
-  url?: string;
-};
+import {
+  actionBackup,
+  actionFetch,
+  actionDelete,
+  actionRestore,
+  Backup,
+  getBackupSizeString,
+  actionAuto
+} from "./helper";
 
 const Backups = () => {
-  const AUTOMATIC_BACKUP = false;
-
   const [loading, setLoading] = useState<boolean>(true);
   const [backing, setBacking] = useState<boolean>(false);
   const [restoring, setRestoring] = useState<boolean>(false);
+  const [autoStatus, setAutoStatus] = useState<boolean | null>(null);
   const [backups, setBackups] = useState<Backup[]>([]);
   const [openRestore, setOpenRestore] = useState(false);
-  const [backupKey, setbackupKey] = useState<string>("");
+  const [backupDate, setBackupDate] = useState<string | null>(null);
+  const [backupUrl, setBackupUrl] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const dialog = usePrompt();
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchBackups();
+    fetchAutoStatus();
   }, []);
 
   const fetchBackups = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/admin/backup/db-backup", {
-        method: "GET",
-        credentials: "include"
-      });
+      const response = await actionFetch();
       const data = await response.json();
       setBackups(data.backups);
     } catch (error) {
@@ -56,13 +58,21 @@ const Backups = () => {
     }
   };
 
+  const fetchAutoStatus = async () => {
+    try {
+      const response = await actionAuto();
+      const data = await response.json();
+      const value = data?.status === true;
+      setAutoStatus(value);
+    } catch (error) {
+      console.error("Failed to fetch status", error);
+    }
+  };
+
   const handleBackup = async () => {
     try {
       setBacking(true);
-      const response = await fetch("/admin/backup/db-backup", {
-        method: "POST",
-        credentials: "include"
-      });
+      const response = await actionBackup();
       if (response.ok) {
         toast.success("Backup created successfully");
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -81,14 +91,11 @@ const Backups = () => {
   };
 
   const handleRestore = async () => {
+    if (restoring) return;
     setOpenRestore(false);
     try {
       setRestoring(true);
-      const response = await fetch("/admin/backup/db-restore", {
-        method: "POST",
-        body: JSON.stringify({backupKey}),
-        credentials: "include"
-      });
+      const response = await actionRestore(backupUrl);
       if (response.ok) {
         toast.success("Database restored successfully");
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -124,42 +131,98 @@ const Backups = () => {
     }
   };
 
-  const warningMessage =
-    " ⚠️ Warning: Restoring a backup will roll your database back to the state it was in at the backup's timestamp. All changes made since then will be permanently lost. Proceed with caution.";
+  const onRestoreItemClick = (url: string, date: string) => {
+    setBackupDate(date);
+    setBackupUrl(url);
+    setOpenRestore(true);
+  };
+
+  const onDeleteItemClick = async (id: string) => {
+    const confirmed = await dialog({
+      title: "Are you sure?",
+      description: "Please confirm this action"
+    });
+
+    if (!confirmed) return;
+
+    setDeleteLoading(id);
+    const response = await actionDelete(id);
+    if (response.ok) {
+      toast.success("Backup removed");
+      fetchBackups();
+    } else {
+      const errorData = await response.json();
+      toast.error("Failed to remove", {
+        description:
+          errorData?.error || errorData?.message || "An unknown error occurred"
+      });
+    }
+  };
+
+  const onRestoreClick = () => {
+    setBackupDate("");
+    setBackupUrl("");
+    setOpenRestore(true);
+  };
 
   return (
-    <div className="flex flex-col md:flex-row gap-2 p-2">
-      <Container className="flex flex-col gap-10">
-        <Heading level="h1">Backups</Heading>
+    <div className="flex flex-col gap-4 p-2">
+      <Container className="flex flex-col gap-6">
+        <Heading
+          level="h1"
+          className="flex flex-row justify-between items-center"
+        >
+          <span>Backups</span>
+          {autoStatus != null && (
+            <StatusBadge color={autoStatus ? "green" : "grey"}>
+              Automatic Backups ({autoStatus ? "Enabled" : "Disabled"})
+            </StatusBadge>
+          )}
+        </Heading>
         <div className="flex flex-row gap-4">
           <Button variant="primary" onClick={handleBackup} isLoading={backing}>
             Backup
           </Button>
+          <Button
+            variant="secondary"
+            isLoading={restoring}
+            onClick={onRestoreClick}
+          >
+            Restore
+          </Button>
           <FocusModal open={openRestore} onOpenChange={setOpenRestore}>
-            <FocusModal.Trigger asChild>
-              <Button variant="secondary" isLoading={restoring}>
-                Restore
-              </Button>
-            </FocusModal.Trigger>
             <FocusModal.Content>
               <FocusModal.Header>
-                <Button onClick={handleRestore}>Save</Button>
+                <Button variant="danger" onClick={handleRestore}>
+                  Confirm
+                </Button>
               </FocusModal.Header>
               <FocusModal.Body className="flex flex-col items-center py-16">
                 <div className="flex w-full max-w-lg flex-col gap-y-8">
                   <div className="flex flex-col gap-y-1">
                     <Heading>Confirm Restore</Heading>
-                    <Text className="text-ui-fg-subtle">{warningMessage}</Text>
+                    <p className="text-xs opacity-50 select-none scale-80">
+                      <span className="flex flex-wrap items-center gap-2">
+                        <InformationCircle />
+                        Restoring this backup will revert your database to its
+                        state at the time of the backup.
+                      </span>
+                    </p>
                   </div>
+                  {backupDate && (
+                    <div className="flex flex-col text-xs border rounded-lg p-4">
+                      <span className="opacity-70">Restoring backup from</span>
+                      <div className="text-green-700 dark:text-green-400">
+                        {backupDate}
+                      </div>
+                    </div>
+                  )}
                   <div className="flex flex-col gap-y-2">
-                    <Label htmlFor="key_name" className="text-ui-fg-subtle">
-                      Key
-                    </Label>
                     <Input
                       id="backup_key"
-                      placeholder="Enter Backup Key"
-                      value={backupKey}
-                      onChange={(e) => setbackupKey(e.target.value)}
+                      placeholder="Enter URL"
+                      value={backupUrl ?? ""}
+                      onChange={(e) => setBackupUrl(e.target.value)}
                     />
                   </div>
                 </div>
@@ -167,10 +230,14 @@ const Backups = () => {
             </FocusModal.Content>
           </FocusModal>
         </div>
-        <p className="text-xs opacity-50">{warningMessage}</p>
-        <StatusBadge color={AUTOMATIC_BACKUP ? "green" : "grey"}>
-          Automatic Backups ({AUTOMATIC_BACKUP ? "On" : "Off"})
-        </StatusBadge>
+        <p className="text-xs opacity-50 select-none">
+          <span className="flex flex-wrap items-center gap-2">
+            <InformationCircle />
+            Restoring a backup will revert your database to its state at the
+            time of the backup. All changes made after that point will be lost.
+            Please proceed with caution.
+          </span>
+        </p>
       </Container>
       <Container className="flex flex-col gap-10 p-0">
         {loading && backups.length == 0 ? (
@@ -182,27 +249,77 @@ const Backups = () => {
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell className="rounded-lg">
+                  Backup
+                </Table.HeaderCell>
+                <Table.HeaderCell className="rounded-lg">URL</Table.HeaderCell>
+                <Table.HeaderCell className="rounded-lg">
                   Status
                 </Table.HeaderCell>
+                <Table.HeaderCell className="rounded-lg">Size</Table.HeaderCell>
                 <Table.HeaderCell className="rounded-lg">
                   Created At
+                </Table.HeaderCell>
+                <Table.HeaderCell className="rounded-lg">
+                  Actions
                 </Table.HeaderCell>
               </Table.Row>
             </Table.Header>
             {backups?.length > 0 ? (
               <Table.Body>
-                {backups.map((backup) => (
-                  <Table.Row key={backup.id}>
-                    <Table.Cell>{renderStatusBadge(backup.status)}</Table.Cell>
-                    <Table.Cell>
-                      {new Date(backup.created_at).toLocaleString()} (
-                      {formatDistanceToNow(parseISO(backup.created_at), {
-                        addSuffix: true
-                      })}
-                      )
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
+                {backups.map((backup) => {
+                  const timeAgo = formatDistanceToNow(
+                    parseISO(backup.created_at),
+                    {
+                      addSuffix: true
+                    }
+                  );
+                  const time = new Date(backup.created_at).toLocaleString();
+
+                  return (
+                    <Table.Row key={backup.id}>
+                      <Table.Cell className="flex flex-row items-center gap-2">
+                        {backup.id}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Copy content={backup.fileUrl ?? ""} />
+                      </Table.Cell>
+                      <Table.Cell>
+                        {renderStatusBadge(backup.status)}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {getBackupSizeString(
+                          backup.metadata?.size,
+                          backup.metadata?.originalSize
+                        )}
+                      </Table.Cell>
+                      <Table.Cell className="flex flex-row items-center gap-2">
+                        {time}
+                        <span className="font-semibold">({timeAgo})</span>
+                      </Table.Cell>
+                      <Table.Cell className="">
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            onRestoreItemClick(
+                              backup.fileUrl ?? "",
+                              `${time} (${timeAgo})`
+                            )
+                          }
+                        >
+                          Restore
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          className="ml-2"
+                          onClick={() => onDeleteItemClick(backup.id)}
+                          isLoading={deleteLoading === backup.id}
+                        >
+                          Delete
+                        </Button>
+                      </Table.Cell>
+                    </Table.Row>
+                  );
+                })}
               </Table.Body>
             ) : (
               <div className="flex flex-row px-6 py-2 opacity-50">
@@ -218,7 +335,7 @@ const Backups = () => {
 };
 
 export const config = defineRouteConfig({
-  label: "Backups",
+  label: "Backups (V2)",
   icon: ServerStack
 });
 

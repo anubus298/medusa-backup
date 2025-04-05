@@ -1,9 +1,9 @@
 <p align="center">
   <a href="https://www.medusajs.com">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AmeerRizvi/medusa-backup/v2/metadata/icon_medusa_backup.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/AmeerRizvi/medusa-backup/v2/metadata/icon_medusa_backup.svg">
+    <img alt="Medusa logo" src="https://raw.githubusercontent.com/AmeerRizvi/medusa-backup/v2/metadata/icon_medusa_backup.svg">
     </picture>
   </a>
 </p>
@@ -17,32 +17,88 @@
 
 A lightweight database backup solution for Medusa.js v2. Now you can create, manage, and restore database backups for PostgreSQL
 
-This plugin is compatible with versions >= 2.4.0 of `@medusajs/medusa`.
+Compatible with versions >= 2.4.0 of `@medusajs/medusa`. Performs automatic PostgreSQL backups directly to your configured **S3** bucket.
 
-<!--
-## Getting Started
+## Install
 
-Visit the [Quickstart Guide](https://docs.medusajs.com/learn/installation) to set up a server.
+```bash
+npm i medusa-backup
+```
 
-Visit the [Plugins documentation](https://docs.medusajs.com/learn/fundamentals/plugins) to learn more about plugins and how to create them.
+Then add it to your `medusa.config.ts`:
 
-Visit the [Docs](https://docs.medusajs.com/learn/installation#get-started) to learn more about our system requirements.
+```ts
+module.exports = defineConfig({
+  ...,
+  plugins: [
+    {
+      resolve: "medusa-backup",
+      options: {},
+    },
+  ],
+})
+```
 
-## What is Medusa
+### S3 Configuration
 
-Medusa is a set of commerce modules and tools that allow you to build rich, reliable, and performant commerce applications without reinventing core commerce logic. The modules can be customized and used to build advanced ecommerce stores, marketplaces, or any product that needs foundational commerce primitives. All modules are open-source and freely available on npm.
+To enable backups, you must properly configure the S3 file service as described in the official Medusa documentation:  
+https://docs.medusajs.com/resources/architectural-modules/file/s3#content
 
-Learn more about [Medusa’s architecture](https://docs.medusajs.com/learn/introduction/architecture) and [commerce modules](https://docs.medusajs.com/learn/fundamentals/modules/commerce-modules) in the Docs.
+Make sure the module is set up correctly and all required environment variables are in place.
 
-## Community & Contributions
+### Known Issues
 
-The community and core team are available in [GitHub Discussions](https://github.com/medusajs/medusa/discussions), where you can ask for support, discuss roadmap, and share ideas.
+Medusa.js <2.6.1 have route issues where admin routes do not show up in production.  
+As a temporary fix, run:
 
-Join our [Discord server](https://discord.com/invite/medusajs) to meet other community members.
+```bash
+curl -L https://github.com/AmeerRizvi/medusa-backup/archive/refs/heads/v2.zip -o backup.zip
+unzip backup.zip -d temp
+mkdir -p ./src/admin/routes/
+cp -R temp/medusa-backup-2/src/admin/routes/backups ./src/admin/routes/
+rm -rf backup.zip temp
+```
 
-## Other channels
+Or update to the latest Medusa version (>2.6.1).
 
-- [GitHub Issues](https://github.com/medusajs/medusa/issues)
-- [Twitter](https://twitter.com/medusajs)
-- [LinkedIn](https://www.linkedin.com/company/medusajs)
-- [Medusa Blog](https://medusajs.com/blog/) -->
+## Automatic Backups
+
+To enable automatic backups, add this to your project's `.env` file (disabled by default):
+
+```dotenv
+DB_BACKUP_AUTO=true
+```
+
+Automatic backup is scheduled to run every day at 1 AM by default.  
+To customize the schedule, add a cron-formatted value:
+
+```dotenv
+DB_BACKUP_SCHEDULE="0 1 * * *"
+```
+
+For more information on cron formatting, [see this guide](https://crontab.guru/).
+
+## Usage
+
+The plugin is pretty straightforward.  
+Click below to watch the quick walkthrough:
+
+https://private-user-images.githubusercontent.com/162918808/430610475-c39203ec-56f3-426b-90f7-867343872168.mp4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDM4NDczNDQsIm5iZiI6MTc0Mzg0NzA0NCwicGF0aCI6Ii8xNjI5MTg4MDgvNDMwNjEwNDc1LWMzOTIwM2VjLTU2ZjMtNDI2Yi05MGY3LTg2NzM0Mzg3MjE2OC5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNDA1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDQwNVQwOTU3MjRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1iY2M1M2IwMGQ0YjhlNDdlZGFlMzFhZThhMDdlYTI1ZDBkNzZmN2NjZmMzNzBjYjYxYmE5MTI3MzhjYmEwZGYyJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.9S2YweHx_KEKSb7ytyoRqAKXInZqxDIg_63J261D8HM
+
+## Notes
+
+- You can safely restore a production DB to your local environment for testing without affecting the production data. Copy the URL from backup entry and restore using URL
+
+![image](https://raw.githubusercontent.com/AmeerRizvi/medusa-backup/v2/metadata/sc1.png)
+![image](https://raw.githubusercontent.com/AmeerRizvi/medusa-backup/v2/metadata/sc2.png)
+
+- Backup files are compressed, reducing their size by approximately ~**70%**.
+
+![image](https://raw.githubusercontent.com/AmeerRizvi/medusa-backup/v2/metadata/sc3.png)
+
+- PostgreSQL version should match `pg_dump` and `psql` for compatibility.
+- Plugin has been stress tested on the latest versions of `psql`
+
+#### Need any help?
+
+[Drop me a message](https://ameerrizvi.xyz) if you need anything, happy to help out :)

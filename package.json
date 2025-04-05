@@ -1,12 +1,10 @@
 {
   "name": "medusa-backup",
-  "version": "0.0.1",
+  "version": "0.2.16",
   "description": "DB Backup and Restore for Medusa",
   "author": "Ameer Rizvi (https://github.com/AmeerRizvi)",
   "license": "MIT",
-  "files": [
-    ".medusa/server"
-  ],
+  "files": [".medusa/server"],
   "exports": {
     "./package.json": "./package.json",
     "./workflows": "./.medusa/server/src/workflows/index.js",
@@ -28,13 +26,13 @@
     "prepublishOnly": "medusa plugin:build"
   },
   "devDependencies": {
-    "@medusajs/admin-sdk": "2.4.0",
-    "@medusajs/cli": "2.4.0",
-    "@medusajs/framework": "2.4.0",
-    "@medusajs/medusa": "2.4.0",
-    "@medusajs/test-utils": "2.4.0",
-    "@medusajs/ui": "4.0.4",
-    "@medusajs/icons": "2.4.0",
+    "@medusajs/admin-sdk": "2.6.1",
+    "@medusajs/cli": "2.6.1",
+    "@medusajs/framework": "2.6.1",
+    "@medusajs/medusa": "2.6.1",
+    "@medusajs/test-utils": "2.6.1",
+    "@medusajs/ui": "4.0.7",
+    "@medusajs/icons": "2.6.1",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -55,13 +53,13 @@
     "yalc": "^1.0.0-pre.53"
   },
   "peerDependencies": {
-    "@medusajs/admin-sdk": "2.4.0",
-    "@medusajs/cli": "2.4.0",
-    "@medusajs/framework": "2.4.0",
-    "@medusajs/test-utils": "2.4.0",
-    "@medusajs/medusa": "2.4.0",
+    "@medusajs/admin-sdk": "2.6.1",
+    "@medusajs/cli": "2.6.1",
+    "@medusajs/framework": "2.6.1",
+    "@medusajs/test-utils": "2.6.1",
+    "@medusajs/medusa": "2.6.1",
     "@medusajs/ui": "4.0.3",
-    "@medusajs/icons": "2.4.0",
+    "@medusajs/icons": "2.6.1",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -69,6 +67,10 @@
     "@mikro-orm/postgresql": "6.4.3",
     "awilix": "^8.0.1",
     "pg": "^8.13.0"
+  },
+  "dependencies": {
+    "unzipper": "^0.12.3",
+    "date-fns": "^4.1.0"
   },
   "engines": {
     "node": ">=20"
