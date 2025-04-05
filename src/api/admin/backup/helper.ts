@@ -46,9 +46,6 @@ export async function createBackupZip(dir: string, file: string) {
 export function extractDbConfig() {
   const DATABASE_URL = process.env.DATABASE_URL ?? "";
   const parts = DATABASE_URL.split("/");
-  if (parts.length < 4) {
-    throw new Error("DATABASE_URL must include a database name, e.g. /mydb");
-  }
   let DB_NAME = parts.pop();
   let DB_BASE = parts.join("/");
   DB_BASE = process.env.DB_BASE ?? DB_BASE;
