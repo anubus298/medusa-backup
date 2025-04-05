@@ -21,7 +21,9 @@ Compatible with versions >= 2.4.0 of `@medusajs/medusa`. Performs automatic Post
 
 ## Install
 
-    npm i medusa-backup
+```bash
+npm i medusa-backup
+```
 
 Then add it to your `medusa.config.ts`:
 
@@ -49,11 +51,13 @@ Make sure the module is set up correctly and all required environment variables 
 Medusa.js <2.6.1 have route issues where admin routes do not show up in production.  
 As a temporary fix, run:
 
-    curl -L https://github.com/AmeerRizvi/medusa-backup/archive/refs/heads/v2.zip -o backup.zip
-    unzip backup.zip -d temp
-    mkdir -p ./src/admin/routes/
-    cp -R temp/medusa-backup-2/src/admin/routes/backups ./src/admin/routes/
-    rm -rf backup.zip temp
+```bash
+curl -L https://github.com/AmeerRizvi/medusa-backup/archive/refs/heads/v2.zip -o backup.zip
+unzip backup.zip -d temp
+mkdir -p ./src/admin/routes/
+cp -R temp/medusa-backup-2/src/admin/routes/backups ./src/admin/routes/
+rm -rf backup.zip temp
+```
 
 Or update to the latest Medusa version (>2.6.1).
 
@@ -61,12 +65,16 @@ Or update to the latest Medusa version (>2.6.1).
 
 To enable automatic backups, add this to your project's `.env` file (disabled by default):
 
-    DB_BACKUP_AUTO=true
+```dotenv
+DB_BACKUP_AUTO=true
+```
 
 Automatic backup is scheduled to run every day at 1 AM by default.  
 To customize the schedule, add a cron-formatted value:
 
-    DB_BACKUP_SCHEDULE="0 1 * * *"
+```dotenv
+DB_BACKUP_SCHEDULE="0 1 * * *"
+```
 
 For more information on cron formatting, [see this guide](https://crontab.guru/).
 
