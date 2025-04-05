@@ -109,6 +109,8 @@ DB_BACKUP_SCHEDULE="0 1 * * *"
 
 For more information on cron formatting, [see this guide](https://crontab.guru/).
 
+**Automatic backups will work only on production environment**
+
 ## Usage
 
 The plugin is pretty straightforward.  
