@@ -37,14 +37,14 @@ module.exports = defineConfig({
 })
 ```
 
-##### S3 Configuration
+### S3 Configuration
 
 To enable backups, you must properly configure the S3 file service as described in the official Medusa documentation:  
 https://docs.medusajs.com/resources/architectural-modules/file/s3#content
 
 Make sure the module is set up correctly and all required environment variables are in place.
 
-##### Known Issues
+### Known Issues
 
 Medusa.js <2.6.1 have route issues where admin routes do not show up in production.  
 As a temporary fix, run:
@@ -75,7 +75,7 @@ For more information on cron formatting, [see this guide](https://crontab.guru/)
 The plugin is pretty straightforward.  
 Click below to watch the quick walkthrough:
 
-https://raw.githubusercontent.com/AmeerRizvi/medusa-backup/v2/metadata/icon_medusa_backup.svg
+https://raw.githubusercontent.com/AmeerRizvi/medusa-backup/v2/metadata/ref_medusa_backup_1.mp4
 
 ## Notes
 
