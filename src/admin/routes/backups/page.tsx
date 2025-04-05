@@ -21,15 +21,16 @@ import {
   actionFetch,
   actionDelete,
   actionRestore,
-  AUTOMATIC_BACKUP,
   Backup,
-  getBackupSizeString
+  getBackupSizeString,
+  actionAuto
 } from "./helper";
 
 const Backups = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [backing, setBacking] = useState<boolean>(false);
   const [restoring, setRestoring] = useState<boolean>(false);
+  const [autoStatus, setAutoStatus] = useState<boolean | null>(null);
   const [backups, setBackups] = useState<Backup[]>([]);
   const [openRestore, setOpenRestore] = useState(false);
   const [backupDate, setBackupDate] = useState<string | null>(null);
@@ -41,6 +42,7 @@ const Backups = () => {
 
   useEffect(() => {
     fetchBackups();
+    fetchAutoStatus();
   }, []);
 
   const fetchBackups = async () => {
@@ -53,6 +55,17 @@ const Backups = () => {
       console.error("Failed to fetch backups", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAutoStatus = async () => {
+    try {
+      const response = await actionAuto();
+      const data = await response.json();
+      const value = data?.status === true;
+      setAutoStatus(value);
+    } catch (error) {
+      console.error("Failed to fetch status", error);
     }
   };
 
@@ -160,9 +173,11 @@ const Backups = () => {
           className="flex flex-row justify-between items-center"
         >
           <span>Backups</span>
-          <StatusBadge color={AUTOMATIC_BACKUP ? "green" : "grey"}>
-            Automatic Backups ({AUTOMATIC_BACKUP ? "Enabled" : "Disabled"})
-          </StatusBadge>
+          {autoStatus != null && (
+            <StatusBadge color={autoStatus ? "green" : "grey"}>
+              Automatic Backups ({autoStatus ? "Enabled" : "Disabled"})
+            </StatusBadge>
+          )}
         </Heading>
         <div className="flex flex-row gap-4">
           <Button variant="primary" onClick={handleBackup} isLoading={backing}>
