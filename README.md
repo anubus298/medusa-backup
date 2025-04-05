@@ -60,7 +60,34 @@ DB_NAME=[DB]
 To enable backups, you must properly configure the S3 file service as described in the official Medusa documentation:  
 https://docs.medusajs.com/resources/architectural-modules/file/s3#content
 
-Make sure the module is set up correctly and all required environment variables are in place.
+Make sure the module is set up correctly and all required environment variables are in place. A sample configuration example:
+
+```ts
+module.exports = defineConfig({
+  modules: [
+    {
+      resolve: "@medusajs/medusa/file",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/file-s3",
+            id: "s3",
+            options: {
+              file_url: process.env.S3_FILE_URL,
+              access_key_id: process.env.S3_ACCESS_KEY_ID,
+              secret_access_key: process.env.S3_SECRET_ACCESS_KEY,
+              region: process.env.S3_REGION,
+              bucket: process.env.S3_BUCKET,
+              endpoint: process.env.S3_ENDPOINT,
+              prefix: "resources/",
+            },
+          },
+        ],
+      },
+    },
+  ],
+})
+```
 
 ## Automatic Backups
 
