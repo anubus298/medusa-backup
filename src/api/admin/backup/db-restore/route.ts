@@ -3,15 +3,14 @@ import os from "os";
 import fs from "fs";
 import {promisify} from "util";
 import {exec} from "child_process";
-import {extractZipFromUrl} from "../helper";
+import {extractDbConfig, extractZipFromUrl} from "../helper";
 
 const TEMP_DIR = os.tmpdir();
-const DB_BASE = process.env.DATABASE_URL;
-const DB_NAME = process.env.DB_NAME;
 const execAsync = promisify(exec);
 
 export async function POST(req, res) {
   try {
+    let {DB_BASE, DB_NAME} = extractDbConfig();
     const {url} = JSON.parse(req.body);
     if (!url) return res.status(400).json({error: "Backup URL is required"});
 

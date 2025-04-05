@@ -39,6 +39,11 @@ module.exports = defineConfig({
 })
 ```
 
+Run migrations
+```bash
+npmx medusa db:migrate
+```
+
 As per default installation, DATABASE_URL should be like this:
 ```dotenv
 DATABASE_URL=postgres://[USERNAME]:[PASSWORD]@[HOST]/[DB]
