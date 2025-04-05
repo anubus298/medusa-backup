@@ -41,7 +41,7 @@ module.exports = defineConfig({
 
 Run migrations
 ```bash
-npmx medusa db:migrate
+npx medusa db:migrate
 ```
 
 As per default installation, DATABASE_URL should be like this:
