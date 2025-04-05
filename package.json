@@ -1,6 +1,6 @@
 {
   "name": "medusa-backup",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "DB Backup and Restore for Medusa.js",
   "author": "Ameer Rizvi (https://github.com/AmeerRizvi)",
   "license": "MIT",
@@ -13,6 +13,14 @@
     "./providers/*": "./.medusa/server/src/providers/*/index.js",
     "./*": "./.medusa/server/src/*.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AmeerRizvi/medusa-backup.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AmeerRizvi/medusa-backup/issues"
+  },
+  "homepage": "https://github.com/AmeerRizvi/medusa-backup#readme",
   "keywords": [
     "medusa-plugin",
     "medusa-backup",
