@@ -25,7 +25,7 @@ Compatible with versions >= 2.4.0 of `@medusajs/medusa`. Performs automatic Post
 npm i medusa-backup
 ```
 
-Then add it to your `medusa.config.ts`:
+**`medusa.config.ts`**:
 
 ```ts
 module.exports = defineConfig({
@@ -39,27 +39,23 @@ module.exports = defineConfig({
 })
 ```
 
+As per default installation, DATABASE_URL should be like this:
+```dotenv
+DATABASE_URL=postgres://[USERNAME]:[PASSWORD]@[HOST]/[DB]
+```
+
+If you have made any changes in the above, please add following .env and this will be bypassed:
+```dotenv
+DB_BASE=postgres://[USERNAME]:[PASSWORD]@[HOST]
+DB_NAME=[DB]
+```
+
 ### S3 Configuration
 
 To enable backups, you must properly configure the S3 file service as described in the official Medusa documentation:  
 https://docs.medusajs.com/resources/architectural-modules/file/s3#content
 
 Make sure the module is set up correctly and all required environment variables are in place.
-
-### Known Issues
-
-Medusa.js <2.6.1 have route issues where admin routes do not show up in production.  
-As a temporary fix, run:
-
-```bash
-curl -L https://github.com/AmeerRizvi/medusa-backup/archive/refs/heads/v2.zip -o backup.zip
-unzip backup.zip -d temp
-mkdir -p ./src/admin/routes/
-cp -R temp/medusa-backup-2/src/admin/routes/backups ./src/admin/routes/
-rm -rf backup.zip temp
-```
-
-Or update to the latest Medusa version (>2.6.1).
 
 ## Automatic Backups
 
@@ -83,9 +79,22 @@ For more information on cron formatting, [see this guide](https://crontab.guru/)
 The plugin is pretty straightforward.  
 Click below to watch the quick walkthrough:
 
-
 https://github.com/user-attachments/assets/8986c8a7-e8f8-44f9-870a-16c14bd0c6da
 
+### Known Issues
+
+Medusa.js <2.6.1 have route issues where admin routes do not show up in production.  
+As a temporary fix, run:
+
+```bash
+curl -L https://github.com/AmeerRizvi/medusa-backup/archive/refs/heads/v2.zip -o backup.zip
+unzip backup.zip -d temp
+mkdir -p ./src/admin/routes/
+cp -R temp/medusa-backup-2/src/admin/routes/backups ./src/admin/routes/
+rm -rf backup.zip temp
+```
+
+Or update to the latest Medusa version (>2.6.1).
 
 ## Notes
 

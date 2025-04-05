@@ -43,9 +43,21 @@ export async function createBackupZip(dir: string, file: string) {
   return {zipFileName, zipFilePath};
 }
 
+function extractDbParts(databaseUrl) {
+  const parts = databaseUrl.split("/");
+  if (parts.length < 4) {
+    throw new Error("DATABASE_URL must include a database name, e.g. /mydb");
+  }
+  const DB_NAME = parts.pop();
+  const DB_BASE = parts.join("/");
+  return {DB_BASE, DB_NAME};
+}
+
 export async function createAndUploadBackup(scope: any) {
-  const DB_BASE = process.env.DB_BASE;
-  const DB_NAME = process.env.DB_NAME;
+  let {DB_BASE, DB_NAME} = extractDbParts(process.env.DATABASE_URL);
+
+  DB_BASE = process.env.DB_BASE ?? DB_BASE;
+  DB_NAME = process.env.DB_NAME ?? DB_NAME;
 
   const TEMP_DIR = os.tmpdir();
   const BACKUP_FILE = path.join(TEMP_DIR, "db_backup.sql");
