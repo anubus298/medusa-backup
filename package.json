@@ -1,6 +1,6 @@
 {
   "name": "medusa-backup",
-  "version": "0.2.16",
+  "version": "1.2.5",
   "description": "DB Backup and Restore for Medusa",
   "author": "Ameer Rizvi (https://github.com/AmeerRizvi)",
   "license": "MIT",
@@ -15,10 +15,18 @@
   },
   "keywords": [
     "medusa",
-    "plugin",
+    "medusa backup",
+    "medusa plugin",
+    "medusa v2 plugin",
+    "medusajs",
+    "medusa database backup",
+    "postgresql backup",
+    "medusa restore",
+    "medusa s3 backup",
+    "medusa admin plugin",
     "medusa-plugin-other",
-    "medusa-plugin",
-    "medusa-v2"
+    "ecommerce backup",
+    "nodejs backup plugin"
   ],
   "scripts": {
     "build": "medusa plugin:build",
