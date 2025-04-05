@@ -39,17 +39,20 @@ module.exports = defineConfig({
 })
 ```
 
-Run migrations
+Run migrations:
+
 ```bash
 npx medusa db:migrate
 ```
 
-As per default installation, DATABASE_URL should be like this:
+As per default installation, DATABASE_URL should be like this in **`.env`**:
+
 ```dotenv
 DATABASE_URL=postgres://[USERNAME]:[PASSWORD]@[HOST]/[DB]
 ```
 
 If you have made any changes in the above, please add following .env and this will be bypassed:
+
 ```dotenv
 DB_BASE=postgres://[USERNAME]:[PASSWORD]@[HOST]
 DB_NAME=[DB]
@@ -79,14 +82,14 @@ module.exports = defineConfig({
               region: process.env.S3_REGION,
               bucket: process.env.S3_BUCKET,
               endpoint: process.env.S3_ENDPOINT,
-              prefix: "resources/",
-            },
-          },
-        ],
-      },
-    },
-  ],
-})
+              prefix: "resources/"
+            }
+          }
+        ]
+      }
+    }
+  ]
+});
 ```
 
 ## Automatic Backups
