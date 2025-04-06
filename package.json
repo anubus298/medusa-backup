@@ -1,10 +1,12 @@
 {
   "name": "medusa-backup",
-  "version": "1.2.10",
+  "version": "1.2.12",
   "description": "DB Backup and Restore for Medusa.js",
   "author": "Ameer Rizvi (https://github.com/AmeerRizvi)",
   "license": "MIT",
-  "files": [".medusa/server"],
+  "files": [
+    ".medusa/server"
+  ],
   "exports": {
     "./package.json": "./package.json",
     "./workflows": "./.medusa/server/src/workflows/index.js",
@@ -44,10 +46,10 @@
     "@medusajs/admin-sdk": "2.6.1",
     "@medusajs/cli": "2.6.1",
     "@medusajs/framework": "2.6.1",
+    "@medusajs/icons": "2.6.1",
     "@medusajs/medusa": "2.6.1",
     "@medusajs/test-utils": "2.6.1",
     "@medusajs/ui": "4.0.7",
-    "@medusajs/icons": "2.6.1",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -71,10 +73,10 @@
     "@medusajs/admin-sdk": "2.6.1",
     "@medusajs/cli": "2.6.1",
     "@medusajs/framework": "2.6.1",
-    "@medusajs/test-utils": "2.6.1",
-    "@medusajs/medusa": "2.6.1",
-    "@medusajs/ui": "4.0.3",
     "@medusajs/icons": "2.6.1",
+    "@medusajs/medusa": "2.6.1",
+    "@medusajs/test-utils": "2.6.1",
+    "@medusajs/ui": "4.0.3",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -84,8 +86,8 @@
     "pg": "^8.13.0"
   },
   "dependencies": {
-    "unzipper": "^0.12.3",
-    "date-fns": "^4.1.0"
+    "date-fns": "^4.1.0",
+    "unzipper": "^0.12.3"
   },
   "engines": {
     "node": ">=20"

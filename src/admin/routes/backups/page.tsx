@@ -11,7 +11,7 @@ import {
   FocusModal,
   Input,
   Copy,
-  usePrompt
+  usePrompt,
 } from "@medusajs/ui";
 import {useEffect, useState} from "react";
 import {formatDistanceToNow, parseISO} from "date-fns";
@@ -23,7 +23,8 @@ import {
   actionRestore,
   Backup,
   getBackupSizeString,
-  actionAuto
+  actionAuto,
+  actionUpdateMetadata,
 } from "./helper";
 
 const Backups = () => {
@@ -36,6 +37,8 @@ const Backups = () => {
   const [backupDate, setBackupDate] = useState<string | null>(null);
   const [backupUrl, setBackupUrl] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [noteSavingId, setNoteSavingId] = useState<string | null>(null);
+
   const dialog = usePrompt();
 
   const navigate = useNavigate();
@@ -80,7 +83,7 @@ const Backups = () => {
       } else {
         const errorData = await response.json();
         toast.error("Failed to create backup", {
-          description: errorData?.error || "An unknown error occurred"
+          description: errorData?.error || "An unknown error occurred",
         });
       }
     } catch (error) {
@@ -106,12 +109,12 @@ const Backups = () => {
           description:
             errorData?.error ||
             errorData?.message ||
-            "An unknown error occurred during restoration"
+            "An unknown error occurred during restoration",
         });
       }
     } catch (error) {
       toast.error("Failed to restore database", {
-        description: "There was an error attempting to restore the database."
+        description: "There was an error attempting to restore the database.",
       });
     } finally {
       setRestoring(false);
@@ -140,7 +143,7 @@ const Backups = () => {
   const onDeleteItemClick = async (id: string) => {
     const confirmed = await dialog({
       title: "Are you sure?",
-      description: "Please confirm this action"
+      description: "Please confirm this action",
     });
 
     if (!confirmed) return;
@@ -154,7 +157,7 @@ const Backups = () => {
       const errorData = await response.json();
       toast.error("Failed to remove", {
         description:
-          errorData?.error || errorData?.message || "An unknown error occurred"
+          errorData?.error || errorData?.message || "An unknown error occurred",
       });
     }
   };
@@ -163,6 +166,30 @@ const Backups = () => {
     setBackupDate("");
     setBackupUrl("");
     setOpenRestore(true);
+  };
+
+  const handleNoteSave = async (id: string, note: string) => {
+    if (!note?.trim()) return;
+
+    const currentBackup = backups.find((b) => b.id === id);
+    const existingNote = currentBackup?.metadata?.note ?? "";
+
+    if (note.trim() === existingNote.trim()) return;
+
+    try {
+      setNoteSavingId(id);
+      const metadata = {...backups.find((b) => b.id === id)?.metadata, note};
+      const response = await actionUpdateMetadata(id, metadata);
+      if (response.ok) {
+        toast.success("Note saved");
+      } else {
+        toast.error("Failed to save note");
+      }
+    } catch (err) {
+      toast.error("Unexpected error while saving note");
+    } finally {
+      setNoteSavingId(null);
+    }
   };
 
   return (
@@ -249,16 +276,14 @@ const Backups = () => {
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell className="rounded-lg">
-                  Backup
+                  Created At
                 </Table.HeaderCell>
                 <Table.HeaderCell className="rounded-lg">URL</Table.HeaderCell>
                 <Table.HeaderCell className="rounded-lg">
                   Status
                 </Table.HeaderCell>
                 <Table.HeaderCell className="rounded-lg">Size</Table.HeaderCell>
-                <Table.HeaderCell className="rounded-lg">
-                  Created At
-                </Table.HeaderCell>
+                <Table.HeaderCell className="rounded-lg">Note</Table.HeaderCell>
                 <Table.HeaderCell className="rounded-lg">
                   Actions
                 </Table.HeaderCell>
@@ -270,7 +295,7 @@ const Backups = () => {
                   const timeAgo = formatDistanceToNow(
                     parseISO(backup.created_at),
                     {
-                      addSuffix: true
+                      addSuffix: true,
                     }
                   );
                   const time = new Date(backup.created_at).toLocaleString();
@@ -278,7 +303,8 @@ const Backups = () => {
                   return (
                     <Table.Row key={backup.id}>
                       <Table.Cell className="flex flex-row items-center gap-2">
-                        {backup.id}
+                        {time}
+                        <span className="font-semibold">({timeAgo})</span>
                       </Table.Cell>
                       <Table.Cell>
                         <Copy content={backup.fileUrl ?? ""} />
@@ -293,8 +319,22 @@ const Backups = () => {
                         )}
                       </Table.Cell>
                       <Table.Cell className="flex flex-row items-center gap-2">
-                        {time}
-                        <span className="font-semibold">({timeAgo})</span>
+                        <div className="w-[250px]">
+                          <Input
+                            placeholder="Add a note"
+                            id="note"
+                            defaultValue={backup.metadata?.note ?? ""}
+                            disabled={noteSavingId === backup.id}
+                            onBlur={(e) =>
+                              handleNoteSave(backup.id, e.target.value)
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                (e.target as HTMLInputElement).blur();
+                              }
+                            }}
+                          />
+                        </div>
                       </Table.Cell>
                       <Table.Cell className="">
                         <Button
@@ -336,7 +376,7 @@ const Backups = () => {
 
 export const config = defineRouteConfig({
   label: "Backups (V2)",
-  icon: ServerStack
+  icon: ServerStack,
 });
 
 export default Backups;

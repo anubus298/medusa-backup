@@ -82,13 +82,13 @@ module.exports = defineConfig({
               region: process.env.S3_REGION,
               bucket: process.env.S3_BUCKET,
               endpoint: process.env.S3_ENDPOINT,
-              prefix: "resources/"
-            }
-          }
-        ]
-      }
-    }
-  ]
+              prefix: "resources/",
+            },
+          },
+        ],
+      },
+    },
+  ],
 });
 ```
 
@@ -124,7 +124,7 @@ Medusa.js <2.6.1 have route issues where admin routes do not show up in producti
 As a temporary fix, run:
 
 ```bash
-curl -L https://github.com/AmeerRizvi/medusa-backup/archive/refs/heads/v2.zip -o backup.zip
+curl -L https://github.com/AmeerRizvi/medusa-backup/archive/refs/heads/main.zip -o backup.zip
 unzip backup.zip -d temp
 mkdir -p ./src/admin/routes/
 cp -R temp/medusa-backup-2/src/admin/routes/backups ./src/admin/routes/

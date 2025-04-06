@@ -7,6 +7,7 @@ export type Backup = {
   metadata?: {
     size?: number;
     originalSize?: number;
+    note?: string;
   };
 };
 
@@ -26,7 +27,7 @@ export const getBackupSizeString = (
 export const actionFetch = async () => {
   const response = await fetch("/admin/backup/db-backup", {
     method: "GET",
-    credentials: "include"
+    credentials: "include",
   });
   return response;
 };
@@ -34,7 +35,7 @@ export const actionFetch = async () => {
 export const actionBackup = async () => {
   const response = await fetch("/admin/backup/db-backup", {
     method: "POST",
-    credentials: "include"
+    credentials: "include",
   });
   return response;
 };
@@ -43,7 +44,7 @@ export const actionDelete = async (id: string | null) => {
   const response = await fetch(`/admin/backup/db-backup`, {
     method: "DELETE",
     credentials: "include",
-    body: JSON.stringify({id})
+    body: JSON.stringify({id}),
   });
   return response;
 };
@@ -52,7 +53,7 @@ export const actionRestore = async (backupUrl: string | null) => {
   const response = await fetch("/admin/backup/db-restore", {
     method: "POST",
     body: JSON.stringify({url: backupUrl}),
-    credentials: "include"
+    credentials: "include",
   });
   return response;
 };
@@ -60,7 +61,19 @@ export const actionRestore = async (backupUrl: string | null) => {
 export const actionAuto = async () => {
   const response = await fetch("/admin/backup/auto-status", {
     method: "GET",
-    credentials: "include"
+    credentials: "include",
+  });
+  return response;
+};
+
+export const actionUpdateMetadata = async (
+  id: string,
+  metadata: Record<string, any>
+) => {
+  const response = await fetch("/admin/backup/update-metadata", {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify({id, metadata}),
   });
   return response;
 };
