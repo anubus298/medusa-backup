@@ -51,12 +51,21 @@ As per default installation, DATABASE_URL should be like this in **`.env`**:
 DATABASE_URL=postgres://[USERNAME]:[PASSWORD]@[HOST]/[DB]
 ```
 
-If you have made any changes in the above, please add following .env and this will be bypassed:
+If you have made any changes in the above or if you have DB_NAME in your .env seperately, please add following .env and this will be bypassed:
 
 ```dotenv
 DB_BASE=postgres://[USERNAME]:[PASSWORD]@[HOST]
 DB_NAME=[DB]
 ```
+### PostgreSQL Client (pg_dump)
+
+This package uses pg_dump for database backup. Please ensure it's installed on your system.
+
+```bash
+pg_dump --version
+```
+
+ If pg_dump is not found, the backup process will fail.
 
 ### S3 Configuration
 
