@@ -1,4 +1,4 @@
-import {model} from "@medusajs/framework/utils";
+import { model } from "@medusajs/framework/utils"
 
 const Backup = model.define("db_backups", {
   id: model.id().primaryKey(),
@@ -6,6 +6,6 @@ const Backup = model.define("db_backups", {
   fileUrl: model.text().nullable(),
   status: model.text().nullable(),
   metadata: model.json().nullable(),
-});
+})
 
-export default Backup;
+export default Backup
