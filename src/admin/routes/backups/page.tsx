@@ -335,7 +335,7 @@ const Backups = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "Backups (V2)",
+  label: "Backups",
   icon: ServerStack,
 })
 
