@@ -1,6 +1,6 @@
 {
   "name": "medusa-backup",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "DB Backup and Restore for Medusa.js",
   "author": "Ameer Rizvi (https://github.com/AmeerRizvi)",
   "license": "MIT",
@@ -93,7 +93,7 @@
   "dependencies": {
     "date-fns": "^4.1.0",
     "unzipper": "^0.12.3",
-    "zod": "^4.0.5"
+    "zod": "^3.25.1"
   },
   "engines": {
     "node": ">=20"
