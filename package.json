@@ -1,8 +1,8 @@
 {
-  "name": "medusa-backup",
-  "version": "1.5.2",
-  "description": "DB Backup and Restore for Medusa.js",
-  "author": "Ameer Rizvi (https://github.com/AmeerRizvi)",
+  "name": "@anubus298/medusa-backup",
+  "version": "1.6.0",
+  "description": " DB Backup and Restore for Medusa.js, forked, optimized & compatible with medusa v2.10+ ",
+  "author": "By anubus298 (https://github.com/anubus298/) forked from Ameer Rizvi (https://github.com/AmeerRizvi)",
   "license": "MIT",
   "files": [
     ".medusa/server"
@@ -22,12 +22,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AmeerRizvi/medusa-backup.git"
+    "url": "https://github.com/anubus298/medusa-backup.git"
   },
   "bugs": {
-    "url": "https://github.com/AmeerRizvi/medusa-backup/issues"
+    "url": "https://github.com/anubus298/medusa-backup/issues"
   },
-  "homepage": "https://github.com/AmeerRizvi/medusa-backup#readme",
+  "homepage": "https://github.com/anubus298/medusa-backup#readme",
   "keywords": [
     "medusa-plugin",
     "medusa-backup",
@@ -48,13 +48,13 @@
     "prepublishOnly": "medusa plugin:build"
   },
   "devDependencies": {
-    "@medusajs/admin-sdk": "2.8.7",
-    "@medusajs/cli": "2.8.7",
-    "@medusajs/framework": "2.8.7",
-    "@medusajs/icons": "2.8.7",
-    "@medusajs/medusa": "2.8.7",
-    "@medusajs/test-utils": "2.8.7",
-    "@medusajs/ui": "4.0.17",
+    "@medusajs/admin-sdk": "2.10.1",
+    "@medusajs/cli": "2.10.1",
+    "@medusajs/framework": "2.10.1",
+    "@medusajs/icons": "2.10.1",
+    "@medusajs/medusa": "2.10.1",
+    "@medusajs/test-utils": "2.10.1",
+    "@medusajs/ui": "^4.0.21",
     "@mikro-orm/cli": "6.4.3",
     "@mikro-orm/core": "6.4.3",
     "@mikro-orm/knex": "6.4.3",
@@ -74,23 +74,8 @@
     "vite": "^5.2.11",
     "yalc": "^1.0.0-pre.53"
   },
-  "peerDependencies": {
-    "@medusajs/admin-sdk": "2.8.7",
-    "@medusajs/cli": "2.8.7",
-    "@medusajs/framework": "2.8.7",
-    "@medusajs/icons": "2.8.7",
-    "@medusajs/medusa": "2.8.7",
-    "@medusajs/test-utils": "2.8.7",
-    "@medusajs/ui": "4.0.17",
-    "@mikro-orm/cli": "6.4.3",
-    "@mikro-orm/core": "6.4.3",
-    "@mikro-orm/knex": "6.4.3",
-    "@mikro-orm/migrations": "6.4.3",
-    "@mikro-orm/postgresql": "6.4.3",
-    "awilix": "^8.0.1",
-    "pg": "^8.13.0"
-  },
   "dependencies": {
+    "adm-zip": "^0.5.16",
     "date-fns": "^4.1.0",
     "unzipper": "^0.12.3",
     "zod": "^3.25.1"

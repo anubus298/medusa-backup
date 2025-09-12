@@ -7,7 +7,7 @@ import { Readable } from "stream"
 import { execSync } from "child_process"
 import { uploadFilesWorkflow } from "@medusajs/medusa/core-flows"
 import { BACKUPS_MODULE } from "../../../modules/backups"
-
+import AdmZip from "adm-zip"
 const TEMP_DIR = os.tmpdir()
 
 export async function extractZipFromUrl(url: string): Promise<string> {
@@ -39,7 +39,9 @@ export async function createBackupZip(dir: string, file: string) {
   const timestamp = new Date().toISOString().replace(/[:.-]/g, "_")
   const zipFileName = `db_backup_${timestamp}.zip`
   const zipFilePath = path.join(dir, zipFileName)
-  execSync(`zip -j "${zipFilePath}" "${file}"`)
+  const zip = new AdmZip()
+  zip.addLocalFile(file)
+  zip.writeZip(zipFilePath)
   return { zipFileName, zipFilePath }
 }
 
@@ -73,6 +75,7 @@ export async function createAndUploadBackup(scope: any, type?: any) {
 
   const { zipFileName, zipFilePath } = await createBackupZip(TEMP_DIR, BACKUP_FILE)
   const fileBuffer = fs.readFileSync(zipFilePath)
+  const fileBase64 = fileBuffer.toString("base64") // correct
 
   const { result } = await uploadFilesWorkflow(scope).run({
     input: {
