@@ -1,7 +1,7 @@
 # Medusa Backup (Forked & Enhanced)
 
 <p align="center">
-  <img alt="Medusa logo" src="https://raw.githubusercontent.com/YOUR-USERNAME/medusa-backup/main/metadata/icon_medusa_backup.svg" width="120">
+  <img alt="Medusa backup logo" src="https://raw.githubusercontent.com/anubus298/medusa-backup/main/metadata/icon_medusa_backup.svg" width="120">
 </p>
 
 <h1 align="center">Medusa Backup (Enhanced Fork)</h1>
