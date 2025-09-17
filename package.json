@@ -1,6 +1,6 @@
 {
   "name": "@anubus298/medusa-backup",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": " DB Backup and Restore for Medusa.js, forked, optimized & compatible with medusa v2.10+ ",
   "author": "By anubus298 (https://github.com/anubus298/) forked from Ameer Rizvi (https://github.com/AmeerRizvi)",
   "license": "MIT",
