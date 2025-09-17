@@ -39,8 +39,8 @@ export async function POST(req: MedusaRequest<{ url?: string | undefined }>, res
 
     let { DB_BASE, DB_NAME } = extractDbConfig()
     logger.info(`📋 Database config - Base: ${DB_BASE}, Target: ${DB_NAME}`)
-
-    const url = req.body.url
+    //@ts-expect-error it works
+    const { url } = JSON.parse(req.body)
     if (!url) {
       logger.error("❌ No backup URL provided")
       return res.status(400).json({ error: "Backup URL is required" })
