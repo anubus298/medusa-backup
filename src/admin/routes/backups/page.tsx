@@ -203,7 +203,7 @@ const Backups = () => {
           <Button variant="primary" onClick={handleBackup} isLoading={backing}>
             Backup
           </Button>
-          <Button variant="secondary" isLoading={restoring} onClick={onRestoreClick}>
+          <Button variant="secondary" isLoading={restoring} onClick={onRestoreClick} disabled={backing}>
             Restore
           </Button>
           <FocusModal open={openRestore} onOpenChange={setOpenRestore}>
@@ -293,7 +293,7 @@ const Backups = () => {
                             placeholder="Add a note"
                             id="note"
                             defaultValue={backup.metadata?.note ?? ""}
-                            disabled={noteSavingId === backup.id}
+                            disabled={noteSavingId === backup.id || backing || restoring}
                             onBlur={(e) => handleNoteSave(backup.id, e.target.value)}
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
@@ -306,11 +306,13 @@ const Backups = () => {
                       <Table.Cell className="">
                         <Button
                           variant="secondary"
+                          disabled={backing || restoring}
                           onClick={() => onRestoreItemClick(backup.fileUrl ?? "", `${time} (${timeAgo})`)}
                         >
                           Restore
                         </Button>
                         <Button
+                          disabled={backing || restoring}
                           variant="secondary"
                           className="ml-2"
                           onClick={() => onDeleteItemClick(backup.id)}
