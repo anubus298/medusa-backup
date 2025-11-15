@@ -19,9 +19,42 @@ export async function extractZipFromUrl(url: string): Promise<string> {
     throw new Error("Failed to fetch ZIP from URL")
   }
 
-  const base64 = Buffer.from(await response.arrayBuffer()).toString("utf-8")
-  const buffer = Buffer.from(base64, "base64")
+  // Get the raw buffer from the response
+  const rawBuffer = Buffer.from(await response.arrayBuffer())
 
+  // Detect if the content is Base64 by checking:
+  // 1. If it's valid UTF-8 text
+  // 2. If it matches Base64 pattern (alphanumeric + / + = padding)
+  // 3. If it doesn't start with ZIP magic bytes (PK)
+  let buffer = rawBuffer
+  const isLikelyBase64 =
+    !(
+      (rawBuffer[0] === 0x50 && rawBuffer[1] === 0x4b) // ZIP magic bytes "PK"
+    ) && /^[A-Za-z0-9+/\r\n]+={0,2}$/.test(rawBuffer.toString("utf-8", 0, Math.min(100, rawBuffer.length)))
+
+  if (isLikelyBase64) {
+    console.log("Detected Base64-encoded file, decoding...")
+    try {
+      const base64String = rawBuffer.toString("utf-8")
+      buffer = Buffer.from(base64String, "base64")
+
+      // Write the decoded ZIP to a temporary file for verification
+      const tempZipPath = path.join(tempDir, "downloaded.zip")
+      fs.writeFileSync(tempZipPath, buffer)
+      console.log(`Base64 decoded and clean ZIP written to: ${tempZipPath}`)
+    } catch (decodeError) {
+      console.error("Failed to decode Base64, trying as raw ZIP...")
+      buffer = rawBuffer
+    }
+  } else {
+    console.log("Detected raw ZIP file, using directly...")
+    // Write the raw ZIP to a temporary file
+    const tempZipPath = path.join(tempDir, "downloaded.zip")
+    fs.writeFileSync(tempZipPath, buffer)
+    console.log(`Raw ZIP written to: ${tempZipPath}`)
+  }
+
+  // Extract the ZIP
   await new Promise((resolve, reject) => {
     Readable.from(buffer)
       .pipe(unzipper.Extract({ path: tempDir }))
@@ -82,7 +115,7 @@ export async function createAndUploadBackup(scope: any, type?: any) {
       files: [
         {
           filename: zipFileName,
-          content: fileBuffer.toString("base64"),
+          content: fileBase64,
           mimeType: "application/zip",
           access: "private",
         },
